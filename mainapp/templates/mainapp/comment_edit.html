@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="form-section container mt-3">
+        <h2>Редактирование комментария</h2>
+        <form method="post">
+            {% csrf_token %}
+            <p>{{ form.text }}</p>
+            <button class="tm-btn tm-btn-primary tm-btn-small" type="submit">Обновить</button>
+            <a href="{% url 'show_post' post_slug=object.article.slug  %}"
+               class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+{% endblock %}

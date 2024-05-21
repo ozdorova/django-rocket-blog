@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="form-section container mt-3">
+        <h2>Удаление комментария</h2>
+        <p>Вы действительно хотите удалить этот комментарий?</p>
+        <pre>{{ object.text }}</pre>
+        <form method="post">
+            {% csrf_token %}
+            <button class="tm-btn tm-btn-primary tm-btn-small" type="submit">Да, удалить</button>
+            <a href="{% url 'show_post' post_slug=object.article.slug  %}"
+               class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+{% endblock %}

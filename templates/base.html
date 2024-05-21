@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+{% load static %}
+{% load mainapp_tags %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{% static 'mainapp/img/main.png' %}" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" href="{% static 'mainapp/css/styles.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'mainapp/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link type="text/css" rel="stylesheet" href="{% static 'mainapp/fontawesome/css/all.min.css' %}"> 
+	<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet"> <!-- https://fonts.google.com/ -->
+
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %} 
+        <title>Default title</title>
+    {% endif %}
+
+</head>
+<body>
+	<header class="tm-header" id="tm-header">
+        <div class="tm-header-wrapper">
+            <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="tm-site-header">
+                <div class="mb-3 mx-auto tm-site-logo"><i class="fas fa-rocket fa-2x"></i></div>            
+                <h1 class="text-center">rocket_blog</h1>
+                {% if user.is_authenticated %}
+                    <h6 class="text-center"><a href="{% url 'users:profile' %}"> {{ user.username }} </a> | <a href="{% url 'users:logout' %}">Выйти</a></h6>
+                {% else %}
+                    <h6 class="text-center"><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}"> Регистрация </a></h6>
+                {%endif%}
+            </div>
+            <nav class="tm-nav" id="tm-nav">            
+                <ul>
+
+                    {% for m in menu %}
+                    
+                    {% if m.menu_id == selected %}
+                        <li class="tm-nav-item active"><a href="{% url m.url %}" class="tm-nav-link">
+                    {% else %}
+                        <li class="tm-nav-item"><a href="{% url m.url %}" class="tm-nav-link">
+                    {% endif %}
+                        <i class="{{m.class}}"></i>
+                        {{m.name}}
+                    </a></li>
+                    {% endfor %}
+
+
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+<div class="container-fluid">
+<main class="tm-main">
+{% block content %}
+
+{% endblock content %}
+</main>
+</div>
+
+
+{% block navigation %}
+    
+{% endblock navigation %}
+    
+<div class="container-fluid">
+    <footer class="row tm-row">
+        <hr class="col-12">
+        <div class="col-md-6 col-12 tm-color-gray">
+            Design: <a rel="nofollow" target="_parent" href="https://templatemo.com" class="tm-external-link">TemplateMo</a>
+        </div>
+        <div class="col-md-6 col-12 tm-color-gray tm-copyright">
+            Foote footer footer footer 2024.
+        </div>
+    </footer>
+</div>
+<script src="{% static 'mainapp/js/jquery.min.js' %}"></script>
+<script src="{% static 'mainapp/js/templatemo-script.js' %}"></script>
+</body>
+</html>

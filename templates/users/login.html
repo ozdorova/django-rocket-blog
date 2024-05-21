@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+{% extends 'base.html' %}
+
+
+{% block content %}
+<h1> Авторизация </h1>
+
+<form method="post">
+    <!-- next используется для возвращение в основном чтобы после авторизации вернуться на предыдущую страницу -->
+    <input type="hidden" name="next" value="{{ next }}" />
+    {% csrf_token %}
+    <div class="form-error"> {{ form.non_field_errors }}</div>
+
+    {% for f in form%}
+
+    <p><label class="form-label" for="{{ f.id_for_label }}">{{ f.label  }}</label> {{ f }}</p>
+    <div class="form-error">{{ f.errors }}</div>
+
+    {% endfor %}
+
+    <p><button type="submit" class="tm-btn tm-btn-primary">Войти</button></p>
+
+    <p><a href="{% url 'users:password_reset' %}" >Забыли пароль?</a></p>
+
+</form>
+
+<hr>
+<p>
+<a href="{% url 'social:begin' 'github' %}"><img src="/media/social-auth/github.png" alt="github" width="10%" height="10%"></a>
+<a href="{% url 'social:begin' 'vk-oauth2' %}"><img src="/media/social-auth/vk.png" alt="vk" width="10%" height="10%"></a>
+</p>
+
+{% endblock content %}
+    
+
+
+
+
