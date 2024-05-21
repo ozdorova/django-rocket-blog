@@ -1,24 +1,17 @@
 
-from django.contrib.auth import authenticate, get_user_model, login, logout
-from django.core.cache import cache
-from django.db.models import QuerySet
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView
-from numpy import extract
-from edu_project.settings import DEFAULT_USER_IMAGE
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.core.cache import cache
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView
 
+from edu_project.settings import DEFAULT_USER_IMAGE
 from mainapp.models import ArticleModel
 
-
-
-from .forms import LoginUserForm, ProfileUserForm, RegisterUserForm, UserPasswordChangeForm
-from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-# Create your views here.
+from .forms import (LoginUserForm, ProfileUserForm, RegisterUserForm,
+                    UserPasswordChangeForm)
 
 
 class RegisterUser(CreateView):
@@ -32,7 +25,7 @@ class RegisterUser(CreateView):
         'selected': selected,
     }
     success_url = reverse_lazy('users:login')
-    
+
     def form_valid(self, form):
         u = form.save(commit=False)
         u.save()
@@ -52,12 +45,13 @@ class EditProfileUser(LoginRequiredMixin, UpdateView):
         'selected': selected,
         'default_image': DEFAULT_USER_IMAGE,
     }
-    
+
     def get_success_url(self) -> str:
         return reverse_lazy('users:profile')
-    
+
     def get_object(self, queryset=None):
         return self.request.user
+
 
 class ProfileUser(LoginRequiredMixin, ListView):
     # класс предстваление для профиля пользователя
@@ -71,14 +65,14 @@ class ProfileUser(LoginRequiredMixin, ListView):
         'default_image': DEFAULT_USER_IMAGE,
     }
     context_object_name = 'user_posts'
-    
+
     def get_queryset(self):
         articles = cache.get('cache_user_articles')
         if not articles:
-            articles = ArticleModel.objects.filter(author_id=self.request.user.id).select_related('cat').select_related('author') #.prefetch_related('comments')
+            articles = ArticleModel.objects.filter(author_id=self.request.user.id).select_related(
+                'cat').select_related('author')  # .prefetch_related('comments')
             cache.set('cache_user_articles', articles, 10)
-        return articles 
-
+        return articles
 
 
 class LoginUser(LoginView):
@@ -88,7 +82,7 @@ class LoginUser(LoginView):
         'title': 'Авторизация'
     }
     success_url = reverse_lazy('users:profile')
-    
+
 #     from users.models import User
 
 # In [3]: from django.contrib.auth.models import Permission
@@ -104,3 +98,4 @@ class UserPasswordChange(PasswordChangeView):
     form_class = UserPasswordChangeForm
     success_url = reverse_lazy('users:password_change_done')
     template_name = 'users/password_change_form.html'
+

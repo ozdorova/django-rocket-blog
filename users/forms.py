@@ -1,9 +1,10 @@
-from dataclasses import fields
 import datetime
+
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
-from django.forms import widgets
+from django.contrib.auth.forms import (AuthenticationForm, PasswordChangeForm,
+                                       UserCreationForm)
+
 
 class LoginUserForm(AuthenticationForm):
     # форма для входа в систему
@@ -13,16 +14,17 @@ class LoginUserForm(AuthenticationForm):
     )
     password = forms.CharField(
         label='Пароль',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
-    
+
     class Meta:
         model = get_user_model()
         fields = ['username', 'password']
 
 
 class RegisterUserForm(UserCreationForm):
-    #форма регистрации
+    # форма регистрации
     # проверки пароля уже есть в UserCreationForm
     username = forms.CharField(
         label='Логин',
@@ -30,17 +32,19 @@ class RegisterUserForm(UserCreationForm):
     )
     password1 = forms.CharField(
         label='Пароль',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
     password2 = forms.CharField(
         label='Повтор пароля',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
-    
+
     class Meta:
         # получение модели бд пользователя
         model = get_user_model()
-        # отображаемые поля 
+        # отображаемые поля
         fields = [
             'username', 'email', 'first_name', 'last_name', 'password1', 'password2',
         ]
@@ -56,7 +60,7 @@ class RegisterUserForm(UserCreationForm):
             'first_name': forms.TextInput(attrs={'class': "form-control mr-0 ml-auto"}),
             'last_name': forms.TextInput(attrs={'class': "form-control mr-0 ml-auto"}),
         }
-    
+
     def clean(self):
         # проверка почты на уникальность
         cleaned_data = super().clean()
@@ -64,8 +68,8 @@ class RegisterUserForm(UserCreationForm):
         if User.objects.filter(email=cleaned_data.get('email')).exists():
             raise forms.ValidationError("Эта почта уже зарегестрированна")
         return cleaned_data
-    
-    
+
+
 class ProfileUserForm(forms.ModelForm):
     # форма для отображение профиля profile.html
     username = forms.CharField(
@@ -85,7 +89,7 @@ class ProfileUserForm(forms.ModelForm):
             years=tuple(range(this_year-100, this_year-5))
         ),
     )
-    
+
     class Meta:
         model = get_user_model()
         fields = [
@@ -99,20 +103,22 @@ class ProfileUserForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': "form-control mr-0 ml-auto"}),
             'last_name': forms.TextInput(attrs={'class': "form-control mr-0 ml-auto"}),
         }
-    
+
 
 class UserPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label='Старый пароль',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
     new_password1 = forms.CharField(
         label='Новый пароль',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
-    new_password2= forms.CharField(
+    new_password2 = forms.CharField(
         label='Подтверждение пароля',
-        widget=forms.PasswordInput(attrs={'class': "form-control mr-0 ml-auto"}),
+        widget=forms.PasswordInput(
+            attrs={'class': "form-control mr-0 ml-auto"}),
     )
-    
-    
+

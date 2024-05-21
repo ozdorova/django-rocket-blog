@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 # alias python3='/usr/local/bin/python3.11'
 
-from pathlib import Path
 import os
-from django.conf.global_settings import SECRET_KEY, STATIC_ROOT, STATICFILES_DIRS
+from pathlib import Path
+
+from django.conf.global_settings import (SECRET_KEY, STATIC_ROOT,
+                                         STATICFILES_DIRS)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-@jrk2x)qf*0w&1n(b4!7yt!=@ce+p6^lj@!$e4lq@x-c_e^k(1'
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get("DEBUG", default=0))
@@ -34,7 +35,6 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
 
 INTERNAL_IPS = ["127.0.0.1",]
 CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
-
 
 
 # Application definition,
@@ -84,8 +84,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-                'templates/'
-            ],
+            'templates/'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,21 +100,8 @@ TEMPLATES = [
 ]
 
 
-
 WSGI_APPLICATION = 'edu_project.wsgi.application'
 
-
-# подключение к бд windows из wsl
-# winhost = '172.20.16.1'
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 # psql -h winhost -p 5432 -U postgres
 # DATABASES = {
@@ -179,9 +166,9 @@ STATIC_URL = '/static/'
 if DEBUG:
     STATICFILES_DIRS = [
         BASE_DIR / 'static/'
-        ]
+    ]
 else:
-    STATIC_ROOT =  BASE_DIR / 'static'
+    STATIC_ROOT = BASE_DIR / 'static'
 # STATIC_ROOT =  BASE_DIR / 'static'
 
 MEDIA_URL = '/media/'
@@ -189,8 +176,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.dummy.DummyCache", # заглушка кеша
-        # "BACKEND": "django.core.cache.backends.redis.RedisCache", # активация кеша 
+        "BACKEND": "django.core.cache.backends.dummy.DummyCache",  # заглушка кеша
+        # "BACKEND": "django.core.cache.backends.redis.RedisCache", # активация кеша
         # "LOCATION": "redis://127.0.0.1:6379",
     }
 }
@@ -202,10 +189,9 @@ CACHES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
-LOGIN_REDIRECT_URL = 'home' # перенаправление после успешного входа в аккаунт
-LOGOUT_REDIRECT_URL = 'home' # --
-LOGIN_URL = 'users:login' # перенаправление после попытки зайти на закрытую страницу
+LOGIN_REDIRECT_URL = 'home'  # перенаправление после успешного входа в аккаунт
+LOGOUT_REDIRECT_URL = 'home'  # --
+LOGIN_URL = 'users:login'  # перенаправление после попытки зайти на закрытую страницу
 
 if DEBUG:
     print("##############################################_DEBUG_##############################################")
@@ -253,25 +239,25 @@ AUTHENTICATION_BACKENDS = [
 
 DEFAULT_USER_IMAGE = MEDIA_URL + "users/default.png"
 
-##### mail.ru
-EMAIL_HOST_PASSWORD = "7aaf7KQBJmdymsnxLf9z"
-EMAIL_HOST = "smtp.mail.ru"
-EMAIL_PORT = 465
-EMAIL_HOST_USER = "django.test@internet.ru"
-EMAIL_USE_SSL = True
-EMAIL_USE_TLS = False
+# mail.ru
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+EMAIL_PORT = os.environ.get('EMAIL_PORT')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS')
 
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 EMAIL_ADMIN = EMAIL_HOST_USER
 
-#github auth
-SOCIAL_AUTH_GITHUB_KEY = '19b318141366e9f6c6cd'
-SOCIAL_AUTH_GITHUB_SECRET = '6f91cc9bc97a541a9d609fa372a5fc5894a05df2'
-#vk auth
-SOCIAL_AUTH_VK_OAUTH2_KEY = '51891582'
-SOCIAL_AUTH_VK_OAUTH2_SECRET = 'zBklFOYvWFVZah16K2lO'
+# github auth
+SOCIAL_AUTH_GITHUB_KEY = os.environ.get('SOCIAL_AUTH_GITHUB_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('SOCIAL_AUTH_GITHUB_SECRET')
+# vk auth
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_VK_OAUTH2_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_VK_OAUTH2_SECRET')
 # дополнительные сведения которые берутся при аторизации vk
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
 
@@ -290,7 +276,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-EMAIL_BACKEND = 'edu_project.backend.email.EmailBackend' # для отправки писем пользователям
+# для отправки писем пользователям
+EMAIL_BACKEND = 'edu_project.backend.email.EmailBackend'
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis'

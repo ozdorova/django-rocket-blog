@@ -1,8 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-# Create your models here.
+from django.db import models
 
-#Необходимо прописать в settings py AUTH_USER_MODEL = 'users.User'
+# Необходимо прописать в settings py AUTH_USER_MODEL = 'users.User'
+
+
 class User(AbstractUser):
     photo = models.ImageField(
         upload_to="users/%Y/%m/%d/",
@@ -15,3 +16,4 @@ class User(AbstractUser):
         null=True,
         verbose_name="Дата рождения",
     )
+

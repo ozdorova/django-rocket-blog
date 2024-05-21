@@ -1,18 +1,18 @@
 
-from turtle import title
-from django.db.models import QuerySet
-from django.db.models.base import Model as Model
-from django.forms import BaseModelForm
-from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, UpdateView
-from django.http import HttpResponseNotFound, HttpResponse, HttpRequest, JsonResponse
+from django.contrib.auth.mixins import \
+    LoginRequiredMixin  # PermissionRequiredMixin
+from django.core.cache import cache
+from django.db.models.base import Model
+from django.http import HttpRequest, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.core.cache import cache
-from .forms import ArticleForm, CommentsForm, ContactForm
-from .models import ArticleModel, Comments
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import (CreateView, DeleteView, DetailView, FormView,
+                                  ListView, UpdateView)
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from .forms import ArticleForm, CommentsForm, ContactForm
+from .models import ArticleModel, Comments
 from .serializers import ArticleSerializer
 
 
@@ -38,19 +38,20 @@ class HomeView(ListView):
     selected = 1
     title = 'Главная'
     paginate_by = 4
-    
+
     context_object_name = 'posts'
     extra_context = {
         'selected': selected,
         'title': title,
     }
-    
+
     def get_queryset(self):
         articles = cache.get('cache_articles')
         if not articles:
-            articles = ArticleModel.objects.filter(is_published=ArticleModel.Status.PUBLISHED).select_related('cat').select_related('author') #.prefetch_related('comments')
+            articles = ArticleModel.objects.filter(is_published=ArticleModel.Status.PUBLISHED).select_related(
+                'cat').select_related('author')  # .prefetch_related('comments')
             cache.set('cache_articles', articles, 10)
-        return articles 
+        return articles
 
 
 def comment(request, post_slug):
@@ -69,19 +70,19 @@ class ShowPost(DetailView):
     template_name = 'mainapp/post.html'
     selected = 0
     title = 'Главная'
-    
+
     slug_url_kwarg = 'post_slug'
-    
+
     context_object_name = 'post'
-    
+
     extra_context = {
         'selected': selected,
         'title': title,
     }
-    
+
     def get_object(self, queryset=None) -> Model:
         return get_object_or_404(ArticleModel.published.select_related('author', 'cat'), slug=self.kwargs[self.slug_url_kwarg])
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['comment_form'] = CommentsForm()
@@ -90,37 +91,36 @@ class ShowPost(DetailView):
 
 class BaseCommentView:
     model = Comments
-    
+
     pk_url_kwarg = 'pk'
-    
+
     def get_success_url(self):
         post = ArticleModel.objects.get(slug=self.object.article.slug)
         return reverse('show_post', kwargs={'post_slug': post.slug})
-    
+
     def get_object(self, queryset=None):
-        return get_object_or_404(Comments.objects.select_related('author', 'article',), pk=self.kwargs[self.pk_url_kwarg])
+        return get_object_or_404(Comments.objects.select_related('author', 'article',),
+                                 pk=self.kwargs[self.pk_url_kwarg])
 
 
 class AddCommentView(BaseCommentView, CreateView):
     form_class = CommentsForm
-    
+
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.article = ArticleModel.objects.get(slug=self.kwargs['post_slug'])
+        form.instance.article = ArticleModel.objects.get(
+            slug=self.kwargs['post_slug'])
         form.save()
         return redirect('show_post', post_slug=self.kwargs['post_slug'])
-    
+
     def form_invalid(self, form):
         form.add_error(None, 'Ошибка')
         return redirect('show_post', post_slug=self.kwargs['post_slug'])
 
 
-
-
 class EditCommentView(BaseCommentView, UpdateView):
     form_class = CommentsForm
     template_name = 'mainapp/comment_edit.html'
-
 
 
 class DeleteCommentView(BaseCommentView, DeleteView):
@@ -138,7 +138,7 @@ class AddPost(LoginRequiredMixin, CreateView):
         'selected': selected,
         'title': title,
     }
-    
+
     def form_valid(self, form):
         a = form.save(commit=False)
         a.author = self.request.user
@@ -153,13 +153,12 @@ class ContactView(LoginRequiredMixin, FormView):
     form_class = ContactForm
     template_name = 'mainapp/contact.html'
     success_url = reverse_lazy('home')
-    
+
     extra_context = {
         'selected': selected,
         'title': title,
     }
-    
-    
+
 
 def contact(request):
     extra_context = {
@@ -179,18 +178,17 @@ def show_post(request):
 #     title = 'Главная'
 #     allow_empty = False
 #     context_object_name = 'posts'
-    
+
 #     slug_url_kwarg = 'cat_slug'
-    
+
 #     def get_queryset(self):
 #         return ArticleModel.published.filter(cat__slug=self.kwargs['cat_slug']).select_related('cat').prefetch_related('comments')
-    
+
 #     def get_context_data(self, **kwargs):
 #         context = super().get_context_data(**kwargs)
 #         context['title'] = self.title
 #         context['selected'] = self.selected
 #         return context
-    
 
 
 def page_not_found(request: HttpRequest, exception) -> HttpResponseNotFound:
